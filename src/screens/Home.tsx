@@ -159,26 +159,28 @@ const Home: React.FC = () => {
         />
       </TextAndSearchContent>
 
-      <ListViewContent
-        data={users}
-        keyExtractor={(item, index) => item + index.toString()}
-        onEndReached={getUserRepos}
-        onEndReachedThreshold={0.1}
-        ListFooterComponent={<FooterList load={loading} />}
-        renderItem={({item}: any) => (
-          <ListView>
-            <Informations>
-              <Text>{item.user.login}</Text>
-              <Text>{item.user.id}</Text>
-            </Informations>
-            <Avatar
-              source={{
-                uri: `${item.user.avatar_url}`,
-              }}
-            />
-          </ListView>
-        )}
-      />
+      {search.length !== 0 ? (
+        <ListViewContent
+          data={users}
+          keyExtractor={(item, index) => item + index.toString()}
+          onEndReached={getUserRepos}
+          onEndReachedThreshold={0.1}
+          ListFooterComponent={<FooterList load={loading} />}
+          renderItem={({item}: any) => (
+            <ListView>
+              <Informations>
+                <Text>{item.user.login}</Text>
+                <Text>{item.user.id}</Text>
+              </Informations>
+              <Avatar
+                source={{
+                  uri: `${item.user.avatar_url}`,
+                }}
+              />
+            </ListView>
+          )}
+        />
+      ) : null}
     </Container>
   );
 };

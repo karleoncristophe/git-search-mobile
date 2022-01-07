@@ -1,7 +1,7 @@
-import axios from 'axios';
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {ActivityIndicator, FlatList, View} from 'react-native';
 import styled from 'styled-components/native';
+import {UsersContext} from '../context/UsersContext';
 
 const Container = styled.View<any>`
   display: flex;
@@ -9,6 +9,7 @@ const Container = styled.View<any>`
   width: 100%;
   justify-content: ${p => (p.search.length !== 0 ? 'flex-start' : 'center')};
   padding-top: 20px;
+  background: #101111;
 `;
 
 const TitleAndAvatarContent = styled.View<any>`
@@ -70,6 +71,8 @@ const Button = styled.TouchableOpacity`
   width: 70px;
 `;
 
+const Navigation = styled.TouchableOpacity``;
+
 const ImageButton = styled.Image`
   width: 25px;
   height: 25px;
@@ -96,40 +99,9 @@ const Informations = styled.View`
   display: flex;
 `;
 
-interface Users {
-  user: {
-    login: string;
-    avatar_url: string;
-    id: number;
-  };
-}
-
-const Home: React.FC = () => {
+const Home: React.FC = ({navigation}: any) => {
   const [search, setSearch] = useState('');
-  const [users, setUsers] = useState<Users[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-
-  const baseURL: string = 'https://api.github.com';
-  const perPage: number = 100;
-
-  const getUserRepos = async () => {
-    if (loading) {
-      return;
-    }
-    setLoading(true);
-    const {data} = await axios.get(
-      `${baseURL}/repositories/8514/issues?page=${page}&per_page=${perPage}`,
-    );
-    setUsers([...users, ...data]);
-    setPage(page + 1);
-    setLoading(false);
-    console.log(data);
-  };
-
-  useEffect(() => {
-    getUserRepos();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const {users, loading, getUserRepos} = useContext(UsersContext);
 
   return (
     <Container search={search}>
@@ -167,17 +139,19 @@ const Home: React.FC = () => {
           onEndReachedThreshold={0.1}
           ListFooterComponent={<FooterList load={loading} />}
           renderItem={({item}: any) => (
-            <ListView>
-              <Informations>
-                <Text>{item.user.login}</Text>
-                <Text>{item.user.id}</Text>
-              </Informations>
-              <Avatar
-                source={{
-                  uri: `${item.user.avatar_url}`,
-                }}
-              />
-            </ListView>
+            <Navigation onPress={() => navigation.navigate('Profile')}>
+              <ListView>
+                <Informations>
+                  <Text>{item.login}</Text>
+                  <Text>{item.id}</Text>
+                </Informations>
+                <Avatar
+                  source={{
+                    uri: `${item.avatar_url}`,
+                  }}
+                />
+              </ListView>
+            </Navigation>
           )}
         />
       ) : null}

@@ -27,7 +27,7 @@ const UsersProvider = (props: Props) => {
   const [page, setPage] = useState(1);
 
   const baseURL: string = 'https://api.github.com';
-  const perPage: number = 20;
+  const perPage: number = 15;
 
   const getUserRepos = async () => {
     if (loading) {

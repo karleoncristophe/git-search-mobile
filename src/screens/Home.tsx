@@ -1,6 +1,6 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useContext, useState} from 'react';
-import {ActivityIndicator, FlatList, View} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import {ActivityIndicator, FlatList} from 'react-native';
 import styled from 'styled-components/native';
 import {UsersContext} from '../context/UsersContext';
 
@@ -15,7 +15,7 @@ const Container = styled.View<any>`
 
 const TitleAndAvatarContent = styled.View<any>`
   margin: 20px;
-  margin-bottom: 0px;
+  margin-bottom: 20px;
   display: ${p => (p.search.length !== 0 ? 'none' : 'flex')};
   flex-direction: row;
   align-items: center;
@@ -102,8 +102,18 @@ const Informations = styled.View`
 
 const Home: React.FC = () => {
   const [search, setSearch] = useState('');
+  const [filteredUSers, setFilteredUsers] = useState<any>([]);
   const {users, loading, getUserRepos} = useContext(UsersContext);
   const navigation = useNavigation<any>();
+
+  useEffect(() => {
+    setFilteredUsers(
+      // @ts-ignore
+      users.filter((get: any) => {
+        return get.login.toLowerCase().includes(search.toLocaleLowerCase());
+      }),
+    );
+  }, [search, users]);
 
   return (
     <Container search={search}>
@@ -133,36 +143,38 @@ const Home: React.FC = () => {
         />
       </TextAndSearchContent>
 
-      {search.length !== 0 ? (
-        <ListViewContent
-          data={users}
-          keyExtractor={(item, index) => item + index.toString()}
-          onEndReached={getUserRepos}
-          onEndReachedThreshold={0.1}
-          ListFooterComponent={<FooterList load={loading} />}
-          renderItem={({item}: any) => (
-            <Navigation
-              onPress={() =>
-                navigation.navigate('Profile', {name: item.login})
-              }>
-              <ListView>
-                <Informations>
-                  <Text>{item.login}</Text>
-                  <Text>{item.id}</Text>
-                </Informations>
-                <Avatar
-                  source={{
-                    uri: `${item.avatar_url}`,
-                  }}
-                />
-              </ListView>
-            </Navigation>
-          )}
-        />
-      ) : null}
+      <ListViewContent
+        data={filteredUSers}
+        keyExtractor={(item, index) => item + index.toString()}
+        onEndReached={getUserRepos}
+        onEndReachedThreshold={0.1}
+        ListFooterComponent={<FooterList load={loading} />}
+        renderItem={({item}: any) => (
+          <Navigation
+            onPress={() => navigation.navigate('Profile', {name: item.login})}>
+            <ListView>
+              <Informations>
+                <Text ellipsizeMode="tail" numberOfLines={2}>
+                  {item.login}
+                </Text>
+                <Text>{item.id}</Text>
+              </Informations>
+              <Avatar
+                source={{
+                  uri: `${item.avatar_url}`,
+                }}
+              />
+            </ListView>
+          </Navigation>
+        )}
+      />
     </Container>
   );
 };
+
+const Loading = styled.View`
+  margin: 10px;
+`;
 
 interface Props {
   load: boolean;
@@ -170,9 +182,9 @@ interface Props {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function FooterList({load}: Props) {
   return (
-    <View>
-      <ActivityIndicator size={25} color="#52b788" />
-    </View>
+    <Loading>
+      <ActivityIndicator size={40} color="#52b788" />
+    </Loading>
   );
 }
 

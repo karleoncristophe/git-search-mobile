@@ -68,19 +68,21 @@ const Text = styled.Text`
 const Navigation = styled.TouchableOpacity`
   display: flex;
   align-items: center;
-  height: 50px;
+  height: 80px;
   width: 100%;
   flex-direction: row;
-  margin-top: 20px;
+  padding-left: 15px;
 `;
 
 const Image = styled.Image`
   height: 30px;
   width: 30px;
+  margin-right: 10px;
 `;
 
 interface User {
-  id: 1329626;
+  login?: string;
+  id: number;
   avatar_url: string;
   name: string;
   company: string;
@@ -93,24 +95,22 @@ interface User {
   followers: number;
   following: number;
 }
-const Profile: React.FC = ({navigation}: any) => {
+
+const Profile: React.FC = ({navigation, route}: any) => {
   const [user, setUser] = useState({} as User);
-  const baseURL: string = 'https://api.github.com';
+  const baseURL: string = `https://api.github.com/users/${route.params.name}`;
   useEffect(() => {
     const getUser = async () => {
-      const {data} = await axios.get(`${baseURL}/users/sibelius`);
+      console.log(`${route.params.name} here`);
+      const {data} = await axios.get(`${baseURL}`);
       setUser(data);
     };
     getUser();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <Container>
       <Navigation onPress={() => navigation.goBack()}>
-        <Image
-          source={{
-            uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Antu_arrow-left.svg/1024px-Antu_arrow-left.svg.png',
-          }}
-        />
+        <Image source={require('../assets/icons/arrow-left.png')} />
         <Text>Go Back</Text>
       </Navigation>
 

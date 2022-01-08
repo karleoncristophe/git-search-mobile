@@ -1,3 +1,4 @@
+import {useNavigation} from '@react-navigation/native';
 import React, {useContext, useState} from 'react';
 import {ActivityIndicator, FlatList, View} from 'react-native';
 import styled from 'styled-components/native';
@@ -99,9 +100,10 @@ const Informations = styled.View`
   display: flex;
 `;
 
-const Home: React.FC = ({navigation}: any) => {
+const Home: React.FC = () => {
   const [search, setSearch] = useState('');
   const {users, loading, getUserRepos} = useContext(UsersContext);
+  const navigation = useNavigation<any>();
 
   return (
     <Container search={search}>
@@ -139,7 +141,10 @@ const Home: React.FC = ({navigation}: any) => {
           onEndReachedThreshold={0.1}
           ListFooterComponent={<FooterList load={loading} />}
           renderItem={({item}: any) => (
-            <Navigation onPress={() => navigation.navigate('Profile')}>
+            <Navigation
+              onPress={() =>
+                navigation.navigate('Profile', {name: item.login})
+              }>
               <ListView>
                 <Informations>
                   <Text>{item.login}</Text>
